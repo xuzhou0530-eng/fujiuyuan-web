@@ -233,6 +233,22 @@ body { overflow-x: hidden; }
 
 /* --- Canvas --- */
 #reportCanvas { display: none; }
+
+/* ============================================================
+   AI CHAT
+   ============================================================ */
+.chat-messages { max-height: 360px; overflow-y: auto; margin-bottom: 14px; display: flex; flex-direction: column; gap: 2px; }
+.chat-bubble { max-width: 88%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.65; word-break: break-word; }
+.chat-bubble.user { align-self: flex-end; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.2); border-radius: 16px 16px 4px 16px; color: #f5f0e8; }
+.chat-bubble.ai { align-self: flex-start; background: #151310; border: 1px solid #2a2520; border-radius: 16px 16px 16px 4px; color: #e0d8cc; }
+.chat-bubble.typing { align-self: flex-start; background: transparent; border: none; color: #6b6258; font-style: italic; padding: 8px 0; }
+.chat-input-row { display: flex; gap: 8px; align-items: center; }
+.chat-input { flex: 1; padding: 12px 16px; background: #151310; border: 1px solid #2a2520; border-radius: 25px; color: #f5f0e8; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.chat-input:focus { border-color: #c9a96e; }
+.chat-input::placeholder { color: #6b6258; }
+.chat-send-btn { padding: 12px 20px; background: linear-gradient(135deg, #c9a96e, #b8943f); color: #1a1a1a; border: none; border-radius: 25px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.chat-hint { font-size: 11px; color: #6b6258; margin-top: 10px; text-align: center; }
 </style>
 </head>
 <body>
@@ -415,6 +431,17 @@ body { overflow-x: hidden; }
   <!-- AI 解读区 -->
   <div id="aiSectionsArea"></div>
 
+  <!-- AI 对话 -->
+  <div class="card" id="chatCard" style="display:none;">
+    <div class="card-title">💬 想问什么就问</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input type="text" class="chat-input" id="chatInput" placeholder="基于你的五行结果，想问什么？" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">发送</button>
+    </div>
+    <div class="chat-hint">基于你的八字结果 AI 回答 · 每次对话消耗少量 API 额度</div>
+  </div>
+
   <!-- 禁忌 -->
   <div class="card" id="tabooCard" style="display:none;">
     <div class="card-title">⚠️ 禁忌提醒</div>
@@ -498,7 +525,9 @@ var APP = {
   currentResult: null,
   energyData: null,
   countData: null,
-  wuxingTab: 'energy'
+  wuxingTab: 'energy',
+  chatHistory: [],
+  chatSending: false
 };
 
 // ============================================================
@@ -750,6 +779,11 @@ function renderResult() {
     area.innerHTML = '<div class="card"><div class="card-title">📋 本地测算结果</div><div class="reading-text" style="color:#6b6258;">以上为本地八字排盘 + 五行统计 + 珠宝推荐结果。<br><br>AI 深度解读需要联网（部署到 Vercel 后可用）。<br><br>八字排盘、五行分析、珠宝推荐均基于本地算法，无需联网即可使用。</div></div>';
     document.getElementById('tabooCard').style.display = 'none';
   }
+
+  // ---- 启用 AI 对话 ----
+  APP.chatHistory = [];
+  document.getElementById('chatCard').style.display = 'block';
+  document.getElementById('chatMessages').innerHTML = '<div class="chat-bubble ai">你好！我是基于你的八字命盘得出的分析结果。有什么想问的尽管开口，比如：我的五行缺什么？适合戴什么首饰？最近运势怎么样？</div>';
 }
 
 function renderBazi(baziData) {
@@ -1445,6 +1479,116 @@ function shareResult() {
       showToast('分享功能需要在微信中打开');
     });
   }
+}
+
+// ============================================================
+// AI CHAT
+// ============================================================
+function sendChat() {
+  if (APP.chatSending) return;
+  var input = document.getElementById('chatInput');
+  var text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  APP.chatSending = true;
+  document.getElementById('chatSendBtn').disabled = true;
+
+  // 添加用户消息
+  APP.chatHistory.push({ role: 'user', content: text });
+  appendBubble('user', text);
+
+  // 显示加载中
+  var typingId = 'typing-' + Date.now();
+  appendBubble('typing', 'AI 正在思考...', typingId);
+
+  // 构建对话上下文
+  var d = APP.currentResult;
+  var contextPrompt = buildChatContext(d, text);
+
+  fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer sk-3b01e2de8cd142f8b6697aa197ab64a8'
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: contextPrompt,
+      temperature: 0.7,
+      max_tokens: 2048,
+      stream: false
+    })
+  }).then(function(res) {
+    if (!res.ok) throw new Error('API error: ' + res.status);
+    return res.json();
+  }).then(function(data) {
+    // 移除加载提示
+    removeBubble(typingId);
+    var reply = data.choices[0].message.content;
+    APP.chatHistory.push({ role: 'assistant', content: reply });
+    appendBubble('ai', reply);
+  }).catch(function(err) {
+    removeBubble(typingId);
+    appendBubble('ai', '抱歉，AI 暂时无法回复（' + err.message + '），请稍后重试。');
+  }).then(function() {
+    APP.chatSending = false;
+    document.getElementById('chatSendBtn').disabled = false;
+    document.getElementById('chatInput').focus();
+    scrollChatBottom();
+  });
+}
+
+function buildChatContext(resultData, userMsg) {
+  var d = resultData;
+  var messages = [
+    { role: 'system', content: '你是一位友善的传统文化与珠宝饰品顾问。你正在和一位刚测算完八字的顾客对话。请根据之前为他/她生成的完整八字分析报告来回答问题。回答要简短亲切（2-4句话），像朋友聊天一样，用大白话。严格遵守合规要求：禁止出现辟邪、化煞、改运、转运、算命、占卜等词，功效描述用舒缓情绪、提升气场、穿搭参考、心理放松、增强自信等合规词。' }
+  ];
+
+  // 注入八字报告上下文
+  var ctx = '以下是这位顾客的八字测算报告内容，请基于此回答后续问题：\n\n';
+  if (d.raw) {
+    ctx += d.raw;
+  } else {
+    ctx += '【八字排盘】\n' + formatBaziContext(d.baziData) + '\n';
+    ctx += '【五行统计】\n金：' + (APP.countData ? APP.countData.jin : '?') + '个 | 木：' + (APP.countData ? APP.countData.mu : '?') + '个 | 水：' + (APP.countData ? APP.countData.shui : '?') + '个 | 火：' + (APP.countData ? APP.countData.huo : '?') + '个 | 土：' + (APP.countData ? APP.countData.tu : '?') + '个\n';
+  }
+  ctx += '\n用户信息：' + (d.inputInfo ? d.inputInfo.gender : '?') + '，出生于' + (d.inputInfo ? d.inputInfo.year + '年' + d.inputInfo.month + '月' + d.inputInfo.day + '日 ' + d.inputInfo.hour + ':' + d.inputInfo.minute : '?') + '，城市：' + (d.inputInfo ? d.inputInfo.city : '?');
+  messages.push({ role: 'user', content: ctx });
+  messages.push({ role: 'assistant', content: '好的，我已经了解这位顾客的八字命盘和五行情况。我会基于这份报告，用亲切的大白话回答顾客的问题。' });
+
+  // 追加历史对话
+  for (var i = 0; i < APP.chatHistory.length; i++) {
+    messages.push(APP.chatHistory[i]);
+  }
+
+  return messages;
+}
+
+function formatBaziContext(baziData) {
+  if (!baziData || !baziData.pillars) return '无数据';
+  var p = baziData.pillars;
+  return '年柱' + p.year + ' 月柱' + p.month + ' 日柱' + p.day + ' 时柱' + p.hour;
+}
+
+function appendBubble(role, text, bubbleId) {
+  var container = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'chat-bubble ' + role;
+  if (bubbleId) div.id = bubbleId;
+  div.textContent = text;
+  container.appendChild(div);
+  scrollChatBottom();
+}
+
+function removeBubble(bubbleId) {
+  var el = document.getElementById(bubbleId);
+  if (el) el.remove();
+}
+
+function scrollChatBottom() {
+  var container = document.getElementById('chatMessages');
+  if (container) container.scrollTop = container.scrollHeight;
 }
 </script>
 
