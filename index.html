@@ -58,8 +58,13 @@ body { overflow-x: hidden; }
 .form-input { width: 100%; padding: 12px 16px; background: #151310; border: 1px solid #2a2520; border-radius: 10px; color: #f5f0e8; font-size: 16px; outline: none; transition: border-color 0.2s; }
 @media (max-width: 400px) { .form-card, .btn-submit, .btn-start, .features, .disclaimer-box, .input-header, .privacy-notice { margin-left: 16px; margin-right: 16px; } .btn-submit, .btn-start { width: calc(100% - 32px); } }
 .form-input:focus { border-color: #c9a96e; }
+.input-clip:focus-within { border-color: #c9a96e; }
 .form-input::placeholder { color: #6b6258; }
-.form-input[type="date"], .form-input[type="time"] { color-scheme: dark; min-height: 44px; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.form-input[type="date"], .form-input[type="time"] { color-scheme: dark; min-height: 44px; }
+/* 裁剪容器 — 防止 iOS date/time 输入框溢出 */
+.input-clip { overflow: hidden; border-radius: 10px; width: 100%; background: #151310; border: 1px solid #2a2520; }
+.date-input, .time-input { -webkit-appearance: none; width: 100%; border: none; margin: 0; background: transparent; border-radius: 0; }
+@media (max-width: 400px) { .date-input, .time-input { font-size: 14px; padding: 12px 10px; } }
 .gender-row { display: flex; gap: 12px; }
 .gender-btn { flex: 1; padding: 14px 0; text-align: center; background: #151310; border: 1px solid #2a2520; border-radius: 10px; color: #a09888; font-size: 16px; cursor: pointer; transition: all 0.2s; }
 .gender-btn.selected { background: rgba(201,169,110,0.12); border-color: #c9a96e; color: #c9a96e; font-weight: 600; }
@@ -286,11 +291,11 @@ body { overflow-x: hidden; }
   <div class="form-card">
     <div class="form-group">
       <label class="form-label"><span class="required">*</span> 出生日期</label>
-      <input type="date" class="form-input" id="birthDate" min="1900-01-01" onchange="onDateChange()">
+      <div class="input-clip"><input type="date" class="form-input date-input" id="birthDate" min="1900-01-01" onchange="onDateChange()"></div>
     </div>
     <div class="form-group">
       <label class="form-label"><span class="required">*</span> 出生时间</label>
-      <input type="time" class="form-input" id="birthTime" onchange="onTimeChange()">
+      <div class="input-clip"><input type="time" class="form-input time-input" id="birthTime" onchange="onTimeChange()"></div>
       <div style="font-size:11px;color:#6b6258;margin-top:4px;">尽量精确到分钟，时辰柱会更准确</div>
     </div>
     <div class="form-group">
