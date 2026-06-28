@@ -631,12 +631,17 @@ function startAnalysis(inputInfo, baziData) {
   setTimeout(function() { setProgress(2); }, 1200);
   setTimeout(function() { setProgress(3); }, 1800);
 
-  // 调用 API（走 Vercel 代理，失败则仅出本地结果）
-  callDeepSeekWithRetry(baziData, inputInfo, 2).then(function(raw) {
+  // 调用 API（先直连 DeepSeek，失败走 Vercel 代理，再失败仅本地结果）
+  tryDirectDeepSeek(baziData, inputInfo).then(function(raw) {
     showFullResult(raw, inputInfo, baziData);
   }).catch(function(err) {
-    console.log('API unavailable, showing local results only.');
-    showLocalOnlyResult(inputInfo, baziData);
+    console.log('Direct API failed, trying Vercel proxy...');
+    callDeepSeekWithRetry(baziData, inputInfo, 2).then(function(raw) {
+      showFullResult(raw, inputInfo, baziData);
+    }).catch(function(err2) {
+      console.log('API unavailable, showing local results only.');
+      showLocalOnlyResult(inputInfo, baziData);
+    });
   });
 }
 
@@ -653,6 +658,32 @@ function showLocalOnlyResult(inputInfo, baziData) {
   setTimeout(function() { switchView('result'); renderResult(); }, 600);
 }
 
+// 直连 DeepSeek API（国内用户主要通路）
+function tryDirectDeepSeek(baziData, inputInfo) {
+  var prompt = buildPrompt(baziData, inputInfo);
+  return fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer sk-3b01e2de8cd142f8b6697aa197ab64a8'
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: '你是一位友善的传统文化研究者，用简洁清晰的大白话交流。输出格式严格按用户要求的卡片式结构，每项一行，不写长篇大论。严格遵守合规要求。' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 4096,
+      stream: false
+    })
+  }).then(function(res) {
+    if (!res.ok) throw new Error('API error: ' + res.status);
+    return res.json();
+  }).then(function(data) {
+    return data.choices[0].message.content;
+  });
+}
 
 function setProgress(step) {
   var texts = ['正在推算八字命盘...', '正在分析五行属性...', 'AI 正在解读运势与性格...', '正在匹配适合你的水晶...'];
