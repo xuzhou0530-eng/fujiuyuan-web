@@ -56,9 +56,10 @@ body { overflow-x: hidden; }
 .form-label { display: block; font-size: 14px; color: #a09888; margin-bottom: 8px; }
 .form-label .required { color: #e57373; }
 .form-input { width: 100%; padding: 12px 16px; background: #151310; border: 1px solid #2a2520; border-radius: 10px; color: #f5f0e8; font-size: 16px; outline: none; transition: border-color 0.2s; }
+@media (max-width: 400px) { .form-card, .btn-submit, .btn-start, .features, .disclaimer-box, .input-header, .privacy-notice { margin-left: 16px; margin-right: 16px; } .btn-submit, .btn-start { width: calc(100% - 32px); } }
 .form-input:focus { border-color: #c9a96e; }
 .form-input::placeholder { color: #6b6258; }
-.form-input[type="date"], .form-input[type="time"] { color-scheme: dark; min-height: 44px; }
+.form-input[type="date"], .form-input[type="time"] { color-scheme: dark; min-height: 44px; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .gender-row { display: flex; gap: 12px; }
 .gender-btn { flex: 1; padding: 14px 0; text-align: center; background: #151310; border: 1px solid #2a2520; border-radius: 10px; color: #a09888; font-size: 16px; cursor: pointer; transition: all 0.2s; }
 .gender-btn.selected { background: rgba(201,169,110,0.12); border-color: #c9a96e; color: #c9a96e; font-weight: 600; }
