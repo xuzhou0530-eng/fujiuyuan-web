@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0d0d">
+<title>福久源中国黄金 — 五行珠宝测算</title>
+<style>
+/* ============================================================
+   CSS Reset & Base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; background: #0d0d0d; color: #f5f0e8; -webkit-tap-highlight-color: transparent; }
+body { overflow-x: hidden; }
+
+/* ============================================================
+   Shared Colors & Tokens
+   ============================================================ */
+.gold-text { color: #c9a96e; }
+.tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
+.tag-gold { background: rgba(201,169,110,0.12); color: #c9a96e; border: 1px solid rgba(201,169,110,0.2); }
+
+/* ============================================================
+   View Container
+   ============================================================ */
+.view { display: none; min-height: 100vh; padding-bottom: 40px; }
+.view.active { display: block; }
+
+/* ============================================================
+   HOME PAGE
+   ============================================================ */
+.home-hero { padding: 60px 30px 40px; text-align: center; background: linear-gradient(180deg, #1a1410 0%, #0d0d0d 100%); }
+.hero-icon { width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; background: rgba(201,169,110,0.1); border: 2px solid rgba(201,169,110,0.3); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.hero-title { font-size: 32px; font-weight: 700; color: #f5f0e8; margin-bottom: 8px; }
+.hero-subtitle { font-size: 16px; color: #c9a96e; margin-bottom: 24px; }
+.hero-desc { font-size: 14px; color: #a09888; line-height: 1.8; padding: 0 10px; }
+.features { display: flex; flex-wrap: wrap; gap: 12px; margin: 30px 30px; }
+.feature-item { flex: 1 1 calc(50% - 6px); min-width: 140px; padding: 20px 16px; background: #1e1b16; border: 1px solid #2a2520; border-radius: 12px; text-align: center; }
+.feature-icon { font-size: 28px; margin-bottom: 8px; }
+.feature-label { font-size: 14px; color: #f5f0e8; font-weight: 500; }
+.btn-start { display: block; width: calc(100% - 60px); margin: 10px 30px 24px; padding: 16px 0; background: linear-gradient(135deg, #c9a96e, #b8943f); color: #1a1a1a; border: none; border-radius: 50px; font-size: 18px; font-weight: 600; text-align: center; cursor: pointer; }
+.btn-start-hint { text-align: center; font-size: 12px; color: #6b6258; margin-bottom: 24px; }
+.disclaimer-box { margin: 24px 30px; padding: 18px 24px; background: rgba(201,169,110,0.06); border-left: 4px solid rgba(201,169,110,0.3); border-radius: 0 8px 8px 0; font-size: 11px; color: #6b6258; line-height: 1.7; text-align: center; overflow-wrap: break-word; word-break: break-all; }
+
+/* ============================================================
+   INPUT PAGE
+   ============================================================ */
+.input-header { padding: 30px 30px 20px; text-align: center; }
+.input-title { font-size: 22px; font-weight: 600; color: #f5f0e8; margin-bottom: 6px; }
+.input-hint { font-size: 13px; color: #a09888; }
+.form-card { margin: 0 30px; padding: 24px; background: #1e1b16; border: 1px solid #2a2520; border-radius: 16px; }
+.form-group { margin-bottom: 20px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label { display: block; font-size: 14px; color: #a09888; margin-bottom: 8px; }
+.form-label .required { color: #e57373; }
+.form-input { width: 100%; padding: 12px 16px; background: #151310; border: 1px solid #2a2520; border-radius: 10px; color: #f5f0e8; font-size: 16px; outline: none; transition: border-color 0.2s; }
+.form-input:focus { border-color: #c9a96e; }
+.form-input::placeholder { color: #6b6258; }
+.form-input[type="date"], .form-input[type="time"] { color-scheme: dark; min-height: 44px; }
+.gender-row { display: flex; gap: 12px; }
+.gender-btn { flex: 1; padding: 14px 0; text-align: center; background: #151310; border: 1px solid #2a2520; border-radius: 10px; color: #a09888; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+.gender-btn.selected { background: rgba(201,169,110,0.12); border-color: #c9a96e; color: #c9a96e; font-weight: 600; }
+.privacy-notice { margin: 16px 30px 0; padding: 12px 16px; background: rgba(66,165,245,0.06); border-left: 3px solid rgba(66,165,245,0.3); border-radius: 0 6px 6px 0; font-size: 12px; color: #6b6258; line-height: 1.6; }
+.btn-submit { display: block; width: calc(100% - 60px); margin: 20px 30px; padding: 16px 0; background: linear-gradient(135deg, #c9a96e, #b8943f); color: #1a1a1a; border: none; border-radius: 50px; font-size: 18px; font-weight: 600; text-align: center; cursor: pointer; }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ============================================================
+   LOADING PAGE
+   ============================================================ */
+.loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 60px 30px; }
+.spinner { width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(201,169,110,0.15); border-top-color: #c9a96e; animation: spin 1s linear infinite; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-size: 20px; color: #f5f0e8; margin-bottom: 8px; }
+.loading-text { font-size: 14px; color: #a09888; margin-bottom: 30px; }
+.progress-dots { display: flex; align-items: center; gap: 0; margin-bottom: 30px; }
+.dot-item { width: 14px; height: 14px; border-radius: 50%; background: #2a2520; transition: all 0.4s; }
+.dot-item.active { background: #c9a96e; box-shadow: 0 0 8px rgba(201,169,110,0.4); }
+.dot-line { width: 40px; height: 2px; background: #2a2520; margin: 0 4px; transition: background 0.4s; }
+.dot-line.active { background: #c9a96e; }
+.progress-labels { display: flex; justify-content: space-between; width: 260px; font-size: 11px; color: #6b6258; }
+.info-card { background: rgba(30,27,22,0.6); border: 1px solid #2a2520; border-radius: 12px; padding: 16px 24px; margin-top: 20px; }
+.info-row { display: flex; padding: 6px 0; font-size: 14px; }
+.info-label { color: #6b6258; width: 60px; flex-shrink: 0; }
+.info-value { color: #f5f0e8; }
+.error-section { text-align: center; margin-top: 20px; }
+.error-msg { color: #e57373; font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
+.btn-retry, .btn-back { display: inline-block; padding: 10px 32px; border-radius: 25px; font-size: 14px; cursor: pointer; margin: 0 6px; }
+.btn-retry { background: linear-gradient(135deg, #c9a96e, #b8943f); color: #1a1a1a; border: none; }
+.btn-back { background: transparent; color: #a09888; border: 1px solid #2a2520; }
+
+/* ============================================================
+   RESULT PAGE
+   ============================================================ */
+.report-header { padding: 40px 30px 24px; text-align: center; background: linear-gradient(180deg, #1a1410 0%, #0d0d0d 100%); }
+.report-title { font-size: 24px; font-weight: 700; color: #f5f0e8; margin-bottom: 8px; }
+.report-meta { font-size: 13px; color: #6b6258; }
+.card { margin: 16px 20px; background: #1e1b16; border-radius: 16px; border: 1px solid #2a2520; padding: 24px; }
+.card-title { font-size: 18px; font-weight: 600; color: #c9a96e; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #2a2520; }
+.bazi-grid { display: flex; justify-content: space-between; gap: 8px; }
+.bazi-pillar { flex: 1; text-align: center; padding: 12px 6px; background: rgba(201,169,110,0.06); border-radius: 12px; border: 1px solid rgba(201,169,110,0.12); }
+.bazi-label { display: block; font-size: 12px; color: #6b6258; margin-bottom: 6px; }
+.bazi-ganzhi { display: block; font-size: 22px; font-weight: 700; color: #f5f0e8; margin-bottom: 4px; }
+.bazi-detail { display: block; font-size: 10px; color: #a09888; }
+.lunar-info { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(42,37,32,0.4); font-size: 13px; color: #a09888; text-align: center; }
+.ws-row { padding: 4px 0; }
+.ws-summary { display: block; font-size: 18px; font-weight: 700; color: #c9a96e; padding: 8px 0; text-align: center; border-bottom: 1px solid rgba(42,37,32,0.4); margin-bottom: 6px; }
+.ws-step { display: block; font-size: 13px; color: #c0b8a8; line-height: 1.8; padding: 3px 0; }
+
+/* --- Wuxing Tabs --- */
+.wuxing-tabs { display: flex; gap: 0; margin-bottom: 20px; background: #151310; border-radius: 12px; padding: 4px; border: 1px solid #2a2520; }
+.wuxing-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; color: #6b6258; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+.wuxing-tab.active { background: linear-gradient(135deg, rgba(201,169,110,0.18), rgba(184,148,63,0.12)); color: #c9a96e; font-weight: 700; }
+
+/* --- Wuxing Bars --- */
+.wuxing-bars { padding: 6px 0; }
+.wuxing-bar-item { display: flex; align-items: center; margin-bottom: 12px; }
+.wuxing-label { width: 28px; font-size: 16px; color: #f5f0e8; font-weight: 500; text-align: center; }
+.wuxing-track { flex: 1; height: 14px; background: #2a2520; border-radius: 7px; margin: 0 10px; overflow: hidden; }
+.wuxing-fill { height: 100%; border-radius: 7px; transition: width 0.8s ease; min-width: 2px; }
+.wuxing-jin { background: linear-gradient(90deg, #c9a96e, #b8943f); }
+.wuxing-mu { background: linear-gradient(90deg, #66BB6A, #388E3C); }
+.wuxing-shui { background: linear-gradient(90deg, #42A5F5, #1E88E5); }
+.wuxing-huo { background: linear-gradient(90deg, #EF5350, #D32F2F); }
+.wuxing-tu { background: linear-gradient(90deg, #FFA726, #F57C00); }
+.wuxing-value { width: 36px; font-size: 15px; color: #f5f0e8; font-weight: 700; text-align: right; }
+.wuxing-count { width: 36px; font-size: 12px; color: #a09888; text-align: center; }
+
+/* --- Tongdang --- */
+.tongdang-section { margin-top: 20px; padding: 16px; background: rgba(201,169,110,0.04); border-radius: 12px; border: 1px solid rgba(201,169,110,0.08); }
+.tongdang-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.tongdang-label { font-size: 14px; color: #f5f0e8; font-weight: 600; }
+.tongdang-label.diff { color: #a09888; }
+.tongdang-track { display: flex; height: 16px; background: #2a2520; border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+.tongdang-fill { height: 100%; transition: width 0.6s; }
+.tongdang-fill.same { background: linear-gradient(90deg, #42A5F5, #1E88E5); border-radius: 8px 0 0 8px; }
+.tongdang-fill.diff { background: linear-gradient(90deg, #F44336, #D32F2F); border-radius: 0 8px 8px 0; }
+.tongdang-desc { display: flex; justify-content: space-between; font-size: 10px; color: #6b6258; }
+
+/* --- Wuxing Tags Row --- */
+.wuxing-tags-row { display: flex; justify-content: space-around; margin-top: 16px; padding: 12px 0; border-top: 1px solid rgba(42,37,32,0.4); }
+.wx-tag-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.wx-tag-label { font-size: 12px; color: #a09888; }
+.wx-tag-rate { font-size: 12px; padding: 2px 10px; border-radius: 12px; font-weight: 600; }
+.wx-tag-wang { background: rgba(244,67,54,0.15); color: #EF5350; }
+.wx-tag-xiang { background: rgba(255,152,0,0.15); color: #FFA726; }
+.wx-tag-xiu { background: rgba(158,158,158,0.12); color: #9E9E9E; }
+.wx-tag-qiu { background: rgba(66,165,245,0.12); color: #42A5F5; }
+.wx-tag-si { background: rgba(96,125,139,0.15); color: #607D8B; }
+.wuxing-annotation { margin-top: 14px; padding: 12px 14px; background: rgba(96,125,139,0.06); border-left: 3px solid rgba(96,125,139,0.3); border-radius: 0 6px 6px 0; }
+.wuxing-annotation text, .wuxing-annotation span { font-size: 11px; color: #6b6258; line-height: 1.6; }
+
+/* --- Rizhu --- */
+.rizhu-card { margin-top: 16px; padding: 16px; background: rgba(201,169,110,0.06); border-radius: 12px; }
+.rizhu-row { display: flex; padding: 4px 0; }
+.rizhu-label { font-size: 14px; color: #a09888; width: 70px; flex-shrink: 0; }
+.rizhu-value { font-size: 14px; color: #f5f0e8; font-weight: 500; }
+
+/* --- Reading --- */
+.reading-text { font-size: 15px; color: #e0d8cc; line-height: 1.8; }
+.crystal-life-explain { padding: 14px 16px; margin-bottom: 14px; background: rgba(201,169,110,0.06); border-radius: 10px; font-size: 14px; color: #e0d8cc; line-height: 1.7; }
+.crystal-section-title { font-size: 15px; font-weight: 600; color: #c9a96e; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(42,37,32,0.4); }
+.crystal-item { background: rgba(201,169,110,0.05); border-radius: 12px; padding: 16px 20px; border: 1px solid rgba(201,169,110,0.1); margin-bottom: 10px; }
+.crystal-element-tag { display: inline-block; font-size: 13px; padding: 3px 12px; border-radius: 12px; margin-bottom: 6px; color: #1a1a1a; font-weight: 600; }
+.crystal-names { font-size: 17px; font-weight: 600; color: #f5f0e8; margin-bottom: 6px; }
+.crystal-effect { font-size: 14px; color: #a09888; line-height: 1.6; }
+.crystal-assist-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tag-jin { background: #c9a96e; }
+.tag-shui { background: #42A5F5; }
+.tag-mu { background: #4CAF50; }
+.tag-huo { background: #F44336; }
+.tag-tu { background: #FF9800; }
+.wear-tip-box { margin-top: 16px; padding: 16px; background: rgba(66,165,245,0.06); border-radius: 12px; border: 1px solid rgba(66,165,245,0.15); }
+.wear-tip-title { font-size: 15px; font-weight: 600; color: #42A5F5; margin-bottom: 8px; }
+.wear-tip-text { font-size: 13px; color: #c0b8a8; line-height: 1.8; }
+.taboo-box { margin-top: 16px; padding: 14px 18px; background: rgba(244,67,54,0.08); border-radius: 10px; font-size: 14px; color: #e57373; line-height: 1.6; }
+.taboo-icon { margin-right: 6px; }
+
+/* --- Flow Year --- */
+.flowyear-item { display: flex; align-items: flex-start; margin-bottom: 8px; padding: 6px 0; }
+.flowyear-dot { color: #c9a96e; font-size: 16px; font-weight: 700; margin-right: 10px; line-height: 1.8; flex-shrink: 0; }
+.flowyear-text { font-size: 15px; color: #e0d8cc; line-height: 1.8; flex: 1; }
+
+/* --- Store Footer --- */
+.store-footer { padding: 16px 20px 32px; }
+.footer-header { display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+.footer-line { width: 40px; height: 1px; background: #2a2520; }
+.footer-title { font-size: 15px; color: #c9a96e; margin: 0 14px; font-weight: 500; }
+.footer-card { background: rgba(30,27,22,0.6); border: 1px solid #2a2520; border-radius: 16px; padding: 20px; }
+.store-name { font-size: 18px; font-weight: 600; color: #f5f0e8; text-align: center; margin-bottom: 4px; }
+.store-tagline { font-size: 12px; color: #a09888; text-align: center; margin-bottom: 12px; }
+.footer-divider { height: 1px; background: #2a2520; margin: 12px 0; }
+.contact-row { display: flex; align-items: flex-start; padding: 8px 0; }
+.contact-icon { width: 30px; font-size: 14px; flex-shrink: 0; }
+.contact-text { font-size: 13px; color: #c0b8a8; line-height: 1.6; flex: 1; }
+.contact-text a { color: #c0b8a8; text-decoration: none; }
+.category-title { font-size: 13px; color: #a09888; margin-bottom: 10px; font-weight: 500; }
+.category-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.store-cta { text-align: center; font-size: 13px; color: #c9a96e; padding: 12px; background: rgba(201,169,110,0.06); border-radius: 10px; }
+.footer-copyright { text-align: center; font-size: 11px; color: #6b6258; margin-top: 16px; }
+
+/* --- Action Bar --- */
+.action-bar { display: flex; gap: 10px; padding: 20px; }
+.btn-act { flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-size: 15px; font-weight: 500; border: none; cursor: pointer; }
+.btn-share { background: linear-gradient(135deg, #c9a96e, #b8943f); color: #1a1a1a; }
+.btn-save { background: rgba(201,169,110,0.12); color: #c9a96e; border: 2px solid rgba(201,169,110,0.3); }
+.btn-retest { background: transparent; color: #a09888; border: 1px solid #2a2520; }
+
+/* --- AI Raw --- */
+.ai-raw-text { font-size: 15px; color: #e0d8cc; line-height: 1.8; white-space: pre-wrap; }
+
+/* ============================================================
+   TOAST & MODAL OVERLAYS
+   ============================================================ */
+.toast-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; z-index: 9999; pointer-events: none; }
+.toast-box { background: rgba(30,27,22,0.95); color: #f5f0e8; padding: 14px 28px; border-radius: 10px; font-size: 14px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+.toast-box.show { opacity: 1; transform: translateY(0); }
+.loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(13,13,13,0.9); display: flex; align-items: center; justify-content: center; z-index: 9998; }
+.loading-spinner { text-align: center; color: #c9a96e; font-size: 16px; }
+.loading-spinner::before { content: ''; display: block; width: 36px; height: 36px; border: 3px solid rgba(201,169,110,0.15); border-top-color: #c9a96e; border-radius: 50%; margin: 0 auto 12px; animation: spin 0.8s linear infinite; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9997; }
+.modal-box { background: #1e1b16; border: 1px solid #2a2520; border-radius: 14px; padding: 24px; width: 300px; text-align: center; }
+.modal-title { font-size: 16px; color: #f5f0e8; margin-bottom: 10px; font-weight: 600; }
+.modal-content { font-size: 14px; color: #a09888; margin-bottom: 20px; line-height: 1.6; }
+.modal-btn { width: 100%; padding: 12px 0; background: linear-gradient(135deg, #c9a96e, #b8943f); color: #1a1a1a; border: none; border-radius: 25px; font-size: 15px; cursor: pointer; }
+
+/* --- Canvas --- */
+#reportCanvas { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     VIEW 1: HOME
+     ============================================================ -->
+<div class="view active" id="view-home">
+  <div class="home-hero">
+    <div class="hero-icon">☯</div>
+    <div class="hero-title">福久源中国黄金</div>
+    <div class="hero-subtitle">AI 五行测算 · 专属珠宝饰品搭配</div>
+    <div class="hero-desc">基于子平八字命理，结合AI大模型精准分析你的五行属性，推荐适合你的水晶、玉石、黄金首饰与木质文玩，到店即可享受专属搭配建议。</div>
+  </div>
+
+  <div class="features">
+    <div class="feature-item"><div class="feature-icon">📅</div><div class="feature-label">八字排盘</div></div>
+    <div class="feature-item"><div class="feature-icon">📊</div><div class="feature-label">五行分析</div></div>
+    <div class="feature-item"><div class="feature-icon">💎</div><div class="feature-label">珠宝饰品推荐</div></div>
+    <div class="feature-item"><div class="feature-icon">📖</div><div class="feature-label">通俗解读</div></div>
+  </div>
+
+  <button class="btn-start" onclick="switchView('input')">开始测算</button>
+  <div class="btn-start-hint">基于子平八字算法 · 传统文化参考</div>
+
+  <div class="disclaimer-box">本内容为传统民俗文化参考，仅供饰品穿搭、心理舒缓参考，不具备科学决策、治病、改变命运的作用。<br>八字算法流派众多，结果可能与其他软件不同，请自行交叉印证。</div>
+
+  <div class="store-footer">
+    <div class="footer-header"><div class="footer-line"></div><div class="footer-title">🏪 到店体验</div><div class="footer-line"></div></div>
+    <div class="footer-card">
+      <div class="store-name" id="storeName1">福久源中国黄金</div>
+      <div class="store-tagline">黄金首饰 · 水晶玉石 · 木质文玩 · 定制搭配</div>
+      <div class="footer-divider"></div>
+      <div class="contact-row"><div class="contact-icon">📍</div><div class="contact-text" id="storeAddr1">桔城路6号香山福久源商业街中国黄金门店（肯德基旁）</div></div>
+      <div class="contact-row"><div class="contact-icon">📞</div><div class="contact-text"><a href="tel:07176296688" id="storePhone1">0717-6296688</a></div></div>
+      <div class="footer-divider"></div>
+      <div class="category-title">门店在售品类（含更多未罗列款式）</div>
+      <div class="category-tags">
+        <span class="tag tag-gold">黄金首饰</span><span class="tag tag-gold">铂金</span><span class="tag tag-gold">银饰</span><span class="tag tag-gold">金发晶</span><span class="tag tag-gold">白水晶</span><span class="tag tag-gold">钛晶</span><span class="tag tag-gold">朱砂</span><span class="tag tag-gold">沉香</span><span class="tag tag-gold">老山檀</span><span class="tag tag-gold">降真香</span><span class="tag tag-gold">琥珀蜜蜡</span><span class="tag tag-gold">玉髓</span><span class="tag tag-gold">天山翠</span><span class="tag tag-gold">珊瑚</span><span class="tag tag-gold">珍珠</span><span class="tag tag-gold">青金石</span><span class="tag tag-gold">南红</span><span class="tag tag-gold">黑曜石</span><span class="tag tag-gold">绿幽灵</span><span class="tag tag-gold">红玛瑙</span><span class="tag tag-gold">紫水晶</span><span class="tag tag-gold">黄水晶</span><span class="tag tag-gold">海蓝宝</span><span class="tag tag-gold">翡翠</span>
+      </div>
+      <div class="store-cta">根据你的五行报告，到店可享专属珠宝饰品搭配建议</div>
+    </div>
+    <div class="footer-copyright">© 福久源中国黄金 | 传统民俗文化参考</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW 2: INPUT
+     ============================================================ -->
+<div class="view" id="view-input">
+  <div class="input-header">
+    <div class="input-title">填写出生信息</div>
+    <div class="input-hint">信息越精准，五行解读越准确</div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-group">
+      <label class="form-label"><span class="required">*</span> 出生日期</label>
+      <input type="date" class="form-input" id="birthDate" min="1900-01-01" onchange="onDateChange()">
+    </div>
+    <div class="form-group">
+      <label class="form-label"><span class="required">*</span> 出生时间</label>
+      <input type="time" class="form-input" id="birthTime" onchange="onTimeChange()">
+      <div style="font-size:11px;color:#6b6258;margin-top:4px;">尽量精确到分钟，时辰柱会更准确</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label"><span class="required">*</span> 出生城市</label>
+      <input type="text" class="form-input" id="birthCity" placeholder="如：宜昌、武汉、北京" oninput="checkCanSubmit()">
+      <div style="font-size:11px;color:#6b6258;margin-top:4px;">用于确定真太阳时（当地经度）</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label"><span class="required">*</span> 性别</label>
+      <div class="gender-row">
+        <div class="gender-btn" id="genderMale" data-gender="男" onclick="onGenderSelect('男')">♂ 男</div>
+        <div class="gender-btn" id="genderFemale" data-gender="女" onclick="onGenderSelect('女')">♀ 女</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="privacy-notice">🔒 所有信息仅用于本次测算，不上传第三方服务器，仅本地临时计算</div>
+  <button class="btn-submit" id="btnSubmit" onclick="onSubmit()">开始测算</button>
+
+  <div class="disclaimer-box">本内容为传统民俗文化参考，仅供饰品穿搭、心理舒缓参考，不具备科学决策、治病、改变命运的作用。<br>八字算法流派众多，结果可能与其他软件不同，请自行交叉印证。</div>
+</div>
+
+<!-- ============================================================
+     VIEW 3: LOADING
+     ============================================================ -->
+<div class="view" id="view-loading">
+  <div class="loading-wrap">
+    <div class="spinner">☯</div>
+    <div class="loading-title">AI 正在为您测算</div>
+    <div class="loading-text" id="loadingStepText">正在推算八字命盘...</div>
+
+    <div class="progress-dots">
+      <div class="dot-item active" id="dot1"></div><div class="dot-line" id="line1"></div>
+      <div class="dot-item" id="dot2"></div><div class="dot-line" id="line2"></div>
+      <div class="dot-item" id="dot3"></div><div class="dot-line" id="line3"></div>
+      <div class="dot-item" id="dot4"></div>
+    </div>
+    <div class="progress-labels">
+      <span>排八字</span><span>算五行</span><span>解读中</span><span>匹配水晶</span>
+    </div>
+
+    <div class="info-card" id="loadingInfoCard"></div>
+
+    <div class="error-section" id="errorSection" style="display:none;">
+      <div class="error-msg" id="errorMsg"></div>
+      <button class="btn-retry" onclick="retryAnalysis()">重新测算</button>
+      <button class="btn-back" onclick="switchView('input')">返回修改</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW 4: RESULT
+     ============================================================ -->
+<div class="view" id="view-result">
+  <div class="report-header">
+    <div class="report-title">☯ 五行珠宝报告</div>
+    <div class="report-meta">生成时间：<span id="generateTime"></span></div>
+  </div>
+
+  <!-- 八字排盘 -->
+  <div class="card" id="baziCard" style="display:none;">
+    <div class="card-title">📅 八字排盘</div>
+    <div class="bazi-grid" id="baziGrid"></div>
+    <div class="lunar-info" id="lunarInfo" style="display:none;"></div>
+  </div>
+
+  <!-- 旺衰格局 -->
+  <div class="card" id="wangShuaiCard" style="display:none;">
+    <div class="card-title">⚖️ 旺衰格局分析</div>
+    <div id="wangShuaiContent"></div>
+  </div>
+
+  <!-- 五行统计 -->
+  <div class="card" id="wuxingCard" style="display:none;">
+    <div class="card-title">📊 五行统计</div>
+    <div class="wuxing-tabs">
+      <div class="wuxing-tab active" id="tabEnergy" onclick="switchWuxingTab('energy')">五行能量(含藏干)</div>
+      <div class="wuxing-tab" id="tabCount" onclick="switchWuxingTab('count')">五行个数(不含藏干)</div>
+    </div>
+    <div class="wuxing-bars" id="wuxingBars"></div>
+    <div class="tongdang-section" id="tongdangSection" style="display:none;">
+      <div class="tongdang-header">
+        <span class="tongdang-label">同党 <span id="samePct">0</span>%</span>
+        <span class="tongdang-label diff">异党 <span id="diffPct">0</span>%</span>
+      </div>
+      <div class="tongdang-track">
+        <div class="tongdang-fill same" id="sameFill" style="width:50%"></div>
+        <div class="tongdang-fill diff" id="diffFill" style="width:50%"></div>
+      </div>
+      <div class="tongdang-desc"><span>同党=日主+印星（生扶自身）</span><span>异党=财+官杀+食伤（克泄耗）</span></div>
+    </div>
+    <div class="wuxing-tags-row" id="wuxingTagsRow"></div>
+    <div class="rizhu-card" id="rizhuCard" style="display:none;"></div>
+    <div class="wuxing-annotation"><span>📐 五行能量数值采用市面通用月令加权算法（天干1分+地支本气1分/余气0.3分/墓气0.1分 × 旺相休囚死倍率），不同排盘工具基础分值略有浮动，喜用神格局结论统一</span></div>
+  </div>
+
+  <!-- 珠宝饰品推荐 -->
+  <div class="card" id="crystalCard" style="display:none;">
+    <div class="card-title">💎 珠宝饰品推荐</div>
+    <div class="crystal-life-explain" id="crystalLifeExplain" style="display:none;"></div>
+    <div class="crystal-section-title" id="crystalMainTitle">🔹 主推推荐</div>
+    <div id="crystalItems"></div>
+    <div id="crystalAssistSection" style="display:none;">
+      <div class="crystal-section-title">🔸 辅助搭配</div>
+      <div class="crystal-assist-row" id="crystalAssistRow"></div>
+    </div>
+    <div class="taboo-box" id="crystalAvoidBox" style="display:none;">
+      <span class="taboo-icon">⚠️</span>谨慎选择：<span id="crystalAvoidText"></span>
+    </div>
+    <div class="wear-tip-box" id="wearTipBox" style="display:none;">
+      <div class="wear-tip-title">📿 佩戴指南</div>
+      <div class="wear-tip-text" id="wearTipText"></div>
+    </div>
+  </div>
+
+  <!-- AI 解读区 -->
+  <div id="aiSectionsArea"></div>
+
+  <!-- 禁忌 -->
+  <div class="card" id="tabooCard" style="display:none;">
+    <div class="card-title">⚠️ 禁忌提醒</div>
+    <div class="reading-text" id="tabooContent"></div>
+  </div>
+
+  <!-- 备用：原始 -->
+  <div class="card" id="rawAICard" style="display:none;">
+    <div class="card-title">🤖 AI 解读</div>
+    <div class="ai-raw-text" id="aiRawContent"></div>
+  </div>
+
+  <!-- 无数据 -->
+  <div class="card" id="noDataCard" style="display:none;">
+    <div class="card-title">暂无数据</div>
+    <div class="reading-text">请先完成测算</div>
+  </div>
+
+  <!-- 免责声明 -->
+  <div class="disclaimer-box">本内容为传统民俗文化参考，仅供饰品穿搭、心理舒缓参考，不具备科学决策、治病、改变命运的作用。<br>八字算法流派众多，结果可能与其他软件不同，请自行交叉印证。</div>
+
+  <!-- 门店 -->
+  <div class="store-footer">
+    <div class="footer-header"><div class="footer-line"></div><div class="footer-title">🏪 到店体验</div><div class="footer-line"></div></div>
+    <div class="footer-card">
+      <div class="store-name" id="storeName2">福久源中国黄金</div>
+      <div class="store-tagline">黄金首饰 · 水晶玉石 · 木质文玩 · 定制搭配</div>
+      <div class="footer-divider"></div>
+      <div class="contact-row"><div class="contact-icon">📍</div><div class="contact-text" id="storeAddr2">桔城路6号香山福久源商业街中国黄金门店（肯德基旁）</div></div>
+      <div class="contact-row"><div class="contact-icon">📞</div><div class="contact-text"><a href="tel:07176296688" id="storePhone2">0717-6296688</a></div></div>
+      <div class="footer-divider"></div>
+      <div class="category-title">门店在售品类（含更多未罗列款式）</div>
+      <div class="category-tags">
+        <span class="tag tag-gold">黄金首饰</span><span class="tag tag-gold">铂金</span><span class="tag tag-gold">银饰</span><span class="tag tag-gold">金发晶</span><span class="tag tag-gold">白水晶</span><span class="tag tag-gold">钛晶</span><span class="tag tag-gold">朱砂</span><span class="tag tag-gold">沉香</span><span class="tag tag-gold">老山檀</span><span class="tag tag-gold">降真香</span><span class="tag tag-gold">琥珀蜜蜡</span><span class="tag tag-gold">玉髓</span><span class="tag tag-gold">天山翠</span><span class="tag tag-gold">珊瑚</span><span class="tag tag-gold">珍珠</span><span class="tag tag-gold">青金石</span><span class="tag tag-gold">南红</span><span class="tag tag-gold">黑曜石</span><span class="tag tag-gold">绿幽灵</span><span class="tag tag-gold">红玛瑙</span><span class="tag tag-gold">紫水晶</span><span class="tag tag-gold">黄水晶</span><span class="tag tag-gold">海蓝宝</span><span class="tag tag-gold">翡翠</span>
+      </div>
+      <div class="store-cta">根据你的五行报告，到店可享专属珠宝饰品搭配建议</div>
+    </div>
+    <div class="footer-copyright">© 福久源中国黄金 | 传统民俗文化参考</div>
+  </div>
+
+  <!-- 操作按钮 -->
+  <div class="action-bar">
+    <button class="btn-act btn-share" onclick="shareResult()">📤 分享</button>
+    <button class="btn-act btn-save" onclick="saveAsImage()">🖼️ 生成图片</button>
+    <button class="btn-act btn-retest" onclick="switchView('input')">🔄 重测</button>
+  </div>
+
+  <!-- Canvas 隐藏 -->
+  <canvas id="reportCanvas"></canvas>
+</div>
+
+<!-- ============================================================
+     TOAST / LOADING / MODAL OVERLAYS
+     ============================================================ -->
+<div class="toast-overlay" id="toastOverlay" style="display:none;"><div class="toast-box" id="toastBox"></div></div>
+<div class="loading-overlay" id="loadingOverlay" style="display:none;"><div class="loading-spinner" id="loadingSpinnerText">加载中...</div></div>
+<div class="modal-overlay" id="modalOverlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-content" id="modalContent"></div>
+    <button class="modal-btn" id="modalBtn" onclick="hideModal()">确定</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="js/util.js"></script>
+<script src="js/yizhangjing.js"></script>
+<script src="js/wuxing_calc.js"></script>
+<script src="js/bazi_full.js"></script>
+<script src="js/api.js"></script>
+
+<script>
+// ============================================================
+// 全局状态
+// ============================================================
+var APP = {
+  currentInput: null,
+  currentBazi: null,
+  currentResult: null,
+  energyData: null,
+  countData: null,
+  wuxingTab: 'energy'
+};
+
+// ============================================================
+// 视图切换
+// ============================================================
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  var target = document.getElementById('view-' + name);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ============================================================
+// Toast / Loading / Modal
+// ============================================================
+var _toastTimer = null;
+function showToast(msg, icon) {
+  icon = icon || 'none';
+  var overlay = document.getElementById('toastOverlay');
+  var box = document.getElementById('toastBox');
+  box.textContent = (icon === 'success' ? '✓ ' : '') + msg;
+  box.classList.add('show');
+  overlay.style.display = 'flex';
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() {
+    box.classList.remove('show');
+    setTimeout(function() { overlay.style.display = 'none'; }, 300);
+  }, 2000);
+}
+
+function showLoading(msg) {
+  document.getElementById('loadingSpinnerText').textContent = msg || '加载中...';
+  document.getElementById('loadingOverlay').style.display = 'flex';
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function showModal(title, content, btnText, cb) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalContent').textContent = content;
+  document.getElementById('modalBtn').textContent = btnText || '确定';
+  document.getElementById('modalOverlay').style.display = 'flex';
+  document.getElementById('modalBtn').onclick = function() {
+    hideModal();
+    if (cb) cb();
+  };
+}
+
+function hideModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+}
+
+// ============================================================
+// INPUT PAGE LOGIC
+// ============================================================
+var inputState = { birthDate: null, birthTime: null, city: '', gender: '' };
+
+function onDateChange() {
+  var el = document.getElementById('birthDate');
+  inputState.birthDate = el.value;
+  checkCanSubmit();
+}
+
+function onTimeChange() {
+  var el = document.getElementById('birthTime');
+  inputState.birthTime = el.value;
+  checkCanSubmit();
+}
+
+function onGenderSelect(g) {
+  inputState.gender = g;
+  document.getElementById('genderMale').classList.toggle('selected', g === '男');
+  document.getElementById('genderFemale').classList.toggle('selected', g === '女');
+  checkCanSubmit();
+}
+
+function checkCanSubmit() {
+  var city = document.getElementById('birthCity').value.trim();
+  inputState.city = city;
+  var ok = inputState.birthDate && inputState.birthTime && city && inputState.gender;
+  document.getElementById('btnSubmit').disabled = !ok;
+}
+
+function onSubmit() {
+  var d = inputState;
+  if (!d.birthDate) { showToast('请选择出生日期'); return; }
+  if (!d.birthTime) { showToast('请选择出生时间'); return; }
+  var city = document.getElementById('birthCity').value.trim();
+  if (!city) { showToast('请输入出生城市'); return; }
+  if (!d.gender) { showToast('请选择性别'); return; }
+
+  // 解析日期和时间
+  var dateParts = d.birthDate.split('-');
+  var year = parseInt(dateParts[0]);
+  var month = parseInt(dateParts[1]);
+  var day = parseInt(dateParts[2]);
+  var timeParts = d.birthTime.split(':');
+  var hour = parseInt(timeParts[0]);
+  var minute = parseInt(timeParts[1]) || 0;
+
+  // 查找城市坐标
+  var coord = lookupCity(city);
+  var longitude = coord ? coord.lng : 120;
+
+  // 调用本地八字算法
+  var baziData = paiBaziFull({ year: year, month: month, day: day, hour: hour, minute: minute, longitude: longitude, gender: d.gender, city: city });
+  var inputInfo = { year: year, month: month, day: day, hour: hour, minute: minute, city: city, longitude: longitude, gender: d.gender };
+
+  APP.currentInput = inputInfo;
+  APP.currentBazi = baziData;
+
+  // 切换到 loading 视图
+  switchView('loading');
+  startAnalysis(inputInfo, baziData);
+}
+
+// ============================================================
+// LOADING PAGE LOGIC
+// ============================================================
+function startAnalysis(inputInfo, baziData) {
+  document.getElementById('errorSection').style.display = 'none';
+  setProgress(0);
+
+  // 显示输入信息
+  var card = document.getElementById('loadingInfoCard');
+  card.innerHTML =
+    '<div class="info-row"><span class="info-label">日期</span><span class="info-value">' + formatDate(inputInfo.year, inputInfo.month, inputInfo.day) + '</span></div>' +
+    '<div class="info-row"><span class="info-label">时间</span><span class="info-value">' + formatTime(inputInfo.hour, inputInfo.minute) + '</span></div>' +
+    '<div class="info-row"><span class="info-label">城市</span><span class="info-value">' + inputInfo.city + '</span></div>' +
+    '<div class="info-row"><span class="info-label">性别</span><span class="info-value">' + inputInfo.gender + '</span></div>';
+
+  // 模拟进度
+  setTimeout(function() { setProgress(1); }, 600);
+  setTimeout(function() { setProgress(2); }, 1200);
+  setTimeout(function() { setProgress(3); }, 1800);
+
+  // 调用 API（走 Vercel 代理，失败则仅出本地结果）
+  callDeepSeekWithRetry(baziData, inputInfo, 2).then(function(raw) {
+    showFullResult(raw, inputInfo, baziData);
+  }).catch(function(err) {
+    console.log('API unavailable, showing local results only.');
+    showLocalOnlyResult(inputInfo, baziData);
+  });
+}
+
+function showFullResult(raw, inputInfo, baziData) {
+  setProgress(4);
+  APP.currentResult = { raw: raw, inputInfo: inputInfo, baziData: baziData };
+  try { saveHistory(inputInfo, baziData, raw); } catch(e) {}
+  setTimeout(function() { switchView('result'); renderResult(); }, 800);
+}
+
+function showLocalOnlyResult(inputInfo, baziData) {
+  setProgress(4);
+  APP.currentResult = { raw: null, inputInfo: inputInfo, baziData: baziData, localOnly: true };
+  setTimeout(function() { switchView('result'); renderResult(); }, 600);
+}
+
+
+function setProgress(step) {
+  var texts = ['正在推算八字命盘...', '正在分析五行属性...', 'AI 正在解读运势与性格...', '正在匹配适合你的水晶...'];
+  document.getElementById('loadingStepText').textContent = texts[step] || texts[0];
+  for (var i = 1; i <= 4; i++) {
+    var dot = document.getElementById('dot' + i);
+    if (dot) dot.classList.toggle('active', i <= step + 1);
+  }
+  for (var j = 1; j <= 3; j++) {
+    var line = document.getElementById('line' + j);
+    if (line) line.classList.toggle('active', j <= step);
+  }
+}
+
+function retryAnalysis() {
+  document.getElementById('errorSection').style.display = 'none';
+  setProgress(0);
+  startAnalysis(APP.currentInput, APP.currentBazi);
+}
+
+// ============================================================
+// RESULT PAGE LOGIC
+// ============================================================
+
+function renderResult() {
+  var d = APP.currentResult;
+  if (!d) { showNoData(); return; }
+
+  var baziData = d.baziData;
+  document.getElementById('generateTime').textContent = getNowDateStr();
+
+  // ---- 计算五行 ----
+  APP.energyData = calcWuxingEnergy(baziData);
+  APP.countData = calcWuxingCount(baziData);
+
+  // ---- 八字排盘 ----
+  renderBazi(baziData);
+
+  // ---- 旺衰格局 ----
+  renderWangShuai(baziData);
+
+  // ---- 五行统计 ----
+  APP.wuxingTab = 'energy';
+  renderWuxingDisplay();
+
+  // ---- 水晶推荐 ----
+  renderCrystal(baziData);
+
+  // ---- AI 解读（仅在有 AI 结果时显示）----
+  if (d.raw) {
+    renderAISections(d.raw);
+    renderTaboo(d.raw);
+  }
+
+  // ---- 本地模式提示 ----
+  if (d.localOnly) {
+    var area = document.getElementById('aiSectionsArea');
+    area.innerHTML = '<div class="card"><div class="card-title">📋 本地测算结果</div><div class="reading-text" style="color:#6b6258;">以上为本地八字排盘 + 五行统计 + 珠宝推荐结果。<br><br>AI 深度解读需要联网（部署到 Vercel 后可用）。<br><br>八字排盘、五行分析、珠宝推荐均基于本地算法，无需联网即可使用。</div></div>';
+    document.getElementById('tabooCard').style.display = 'none';
+  }
+}
+
+function renderBazi(baziData) {
+  if (!baziData || !baziData.pillars) return;
+  var card = document.getElementById('baziCard');
+  card.style.display = 'block';
+  var p = baziData.pillars;
+  var items = [
+    { label: '年柱', value: p.year, desc: '根基于祖辈' },
+    { label: '月柱', value: p.month, desc: '父母/事业' },
+    { label: '日柱', value: p.day, desc: '自身/婚姻' },
+    { label: '时柱', value: p.hour, desc: '子女/晚年' }
+  ];
+  var html = '';
+  items.forEach(function(item) {
+    html += '<div class="bazi-pillar"><span class="bazi-label">' + item.label + '</span><span class="bazi-ganzhi">' + item.value + '</span><span class="bazi-detail">' + item.desc + '</span></div>';
+  });
+  document.getElementById('baziGrid').innerHTML = html;
+
+  if (baziData.lunar) {
+    var lunar = document.getElementById('lunarInfo');
+    lunar.style.display = 'block';
+    lunar.textContent = '农历：' + baziData.lunar.yearName + '年 ' + baziData.lunar.monthName + baziData.lunar.dayName + ' · 生肖' + baziData.lunar.shengXiao;
+  }
+}
+
+function renderWangShuai(baziData) {
+  if (!baziData || !baziData.wangShuai) return;
+  var card = document.getElementById('wangShuaiCard');
+  card.style.display = 'block';
+  var ws = baziData.wangShuai;
+  var html = '<div class="ws-row"><span class="ws-summary">日主' + (ws.dayWuxing || baziData.riZhuWuxing) + ' · ' + ws.bodyLevel + ' · ' + ws.pattern + '</span></div>';
+  if (ws.details && ws.details.length > 0) {
+    ws.details.forEach(function(d) { html += '<div class="ws-row"><span class="ws-step">' + d + '</span></div>'; });
+  }
+  document.getElementById('wangShuaiContent').innerHTML = html;
+}
+
+function renderWuxingDisplay() {
+  document.getElementById('wuxingCard').style.display = 'block';
+  var bars, samePct, diffPct;
+  if (APP.wuxingTab === 'energy') {
+    bars = APP.energyData.bars;
+    samePct = APP.energyData.samePercent;
+    diffPct = APP.energyData.diffPercent;
+  } else {
+    bars = APP.countData.bars;
+    samePct = APP.countData.samePercent || 0;
+    diffPct = APP.countData.diffPercent || 0;
+  }
+
+  document.getElementById('tabEnergy').classList.toggle('active', APP.wuxingTab === 'energy');
+  document.getElementById('tabCount').classList.toggle('active', APP.wuxingTab === 'count');
+
+  // 柱状图
+  var barsHtml = '';
+  bars.forEach(function(bar) {
+    barsHtml += '<div class="wuxing-bar-item">' +
+      '<span class="wuxing-label">' + bar.label + '</span>' +
+      '<div class="wuxing-track"><div class="wuxing-fill wuxing-' + bar.name + '" style="width:' + bar.percent + '%"></div></div>' +
+      '<span class="wuxing-value">' + bar.percent + '%</span>' +
+      (APP.wuxingTab === 'count' ? '<span class="wuxing-count">' + (bar.count || 0) + '个</span>' : '') +
+    '</div>';
+  });
+  document.getElementById('wuxingBars').innerHTML = barsHtml;
+
+  // 同党/异党
+  var tdSection = document.getElementById('tongdangSection');
+  if (samePct > 0) {
+    tdSection.style.display = 'block';
+    document.getElementById('samePct').textContent = samePct;
+    document.getElementById('diffPct').textContent = diffPct;
+    document.getElementById('sameFill').style.width = samePct + '%';
+    document.getElementById('diffFill').style.width = diffPct + '%';
+  } else {
+    tdSection.style.display = 'none';
+  }
+
+  // 旺相休囚死标签
+  var tagsHtml = '';
+  bars.forEach(function(bar) {
+    tagsHtml += '<div class="wx-tag-item"><span class="wx-tag-label">' + bar.label + '</span><span class="wx-tag-rate wx-tag-' + (bar.rateClass || 'xiu') + '">' + (bar.rateLabel || '休') + '</span></div>';
+  });
+  document.getElementById('wuxingTagsRow').innerHTML = tagsHtml;
+
+  // 日主信息
+  if (APP.currentBazi && APP.currentBazi.riZhu) {
+    var rizhuCard = document.getElementById('rizhuCard');
+    var ws = APP.currentBazi.wangShuai || {};
+    var items = [
+      { label: '日主', value: APP.currentBazi.riZhu + '（' + APP.currentBazi.riZhuWuxing + '）' },
+      { label: '强弱', value: ws.bodyLevel || '-' },
+      { label: '格局', value: ws.pattern || '-' },
+      { label: '喜用神', value: ws.yongShen || '-' },
+      { label: '忌神', value: ws.jiShen || '-' }
+    ];
+    rizhuCard.style.display = 'block';
+    var rizhuHtml = '';
+    items.forEach(function(item) {
+      rizhuHtml += '<div class="rizhu-row"><span class="rizhu-label">' + item.label + '</span><span class="rizhu-value">' + item.value + '</span></div>';
+    });
+    rizhuCard.innerHTML = rizhuHtml;
+  }
+}
+
+function switchWuxingTab(tab) {
+  APP.wuxingTab = tab;
+  renderWuxingDisplay();
+}
+
+function renderCrystal(baziData) {
+  var cr = (baziData && baziData.crystal) ? baziData.crystal : null;
+  if (!cr || !cr.mainCrystal || cr.mainCrystal.length === 0) return;
+  var card = document.getElementById('crystalCard');
+  card.style.display = 'block';
+
+  var pinyinMap = { '金': 'jin', '水': 'shui', '木': 'mu', '火': 'huo', '土': 'tu' };
+
+  // 生活解释
+  if (cr.lifeExplain) {
+    document.getElementById('crystalLifeExplain').style.display = 'block';
+    document.getElementById('crystalLifeExplain').textContent = cr.lifeExplain;
+  }
+
+  // 主推
+  var itemsHtml = '';
+  (cr.mainCrystal || []).forEach(function(c) {
+    var cls = pinyinMap[c.element] || 'jin';
+    itemsHtml += '<div class="crystal-item">' +
+      '<span class="crystal-element-tag tag-' + cls + '">' + c.element + '</span>' +
+      '<div class="crystal-names">' + (c.list || []).join('、') + '</div>' +
+      '<div class="crystal-effect">' + (c.effect || '') + '</div>' +
+    '</div>';
+  });
+  document.getElementById('crystalItems').innerHTML = itemsHtml;
+
+  // 辅助
+  if (cr.assistCrystal && cr.assistCrystal.length > 0) {
+    document.getElementById('crystalAssistSection').style.display = 'block';
+    var assistHtml = '';
+    cr.assistCrystal.forEach(function(a) {
+      assistHtml += '<span class="tag tag-gold">' + a + '</span>';
+    });
+    document.getElementById('crystalAssistRow').innerHTML = assistHtml;
+  }
+
+  // 避免
+  if (cr.avoidCrystal && cr.avoidCrystal.length > 0) {
+    document.getElementById('crystalAvoidBox').style.display = 'block';
+    document.getElementById('crystalAvoidText').textContent = cr.avoidCrystal.slice(0, 6).join('、');
+  }
+
+  // 佩戴指南
+  if (cr.wearTip) {
+    document.getElementById('wearTipBox').style.display = 'block';
+    document.getElementById('wearTipText').textContent = cr.wearTip;
+  }
+}
+
+function renderAISections(raw) {
+  if (!raw) return;
+  var parsed = parseAIResult(raw);
+  var area = document.getElementById('aiSectionsArea');
+  var html = '';
+
+  parsed.sections.forEach(function(s) {
+    if (s.type === 'flowyear') {
+      html += '<div class="card"><div class="card-title">' + s.icon + ' ' + s.title + '</div>';
+      (s.items || []).forEach(function(pt) {
+        html += '<div class="flowyear-item"><span class="flowyear-dot">•</span><span class="flowyear-text">' + pt + '</span></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div class="card"><div class="card-title">' + s.icon + ' ' + s.title + '</div><div class="reading-text">' + s.content + '</div></div>';
+    }
+  });
+
+  area.innerHTML = html;
+}
+
+function renderTaboo(raw) {
+  if (!raw) return;
+  var parsed = parseAIResult(raw);
+  if (parsed.tabooText) {
+    document.getElementById('tabooCard').style.display = 'block';
+    document.getElementById('tabooContent').textContent = parsed.tabooText;
+  }
+
+  // 无数据时显示原始
+  if (parsed.sections.length === 0 && !APP.crystalItemsDisplayed) {
+    document.getElementById('rawAICard').style.display = 'block';
+    document.getElementById('aiRawContent').textContent = raw;
+  }
+}
+
+function showNoData() {
+  document.getElementById('noDataCard').style.display = 'block';
+}
+
+// ---- AI 结果解析（复用小程序逻辑） ----
+function parseAIResult(text) {
+  if (!text) return { sections: [], tabooText: '' };
+  var sections = [];
+  var tabooText = '';
+  var blocks = text.split(/【(.+?)】/);
+  for (var i = 1; i < blocks.length; i += 2) {
+    var title = blocks[i].trim();
+    var content = (blocks[i + 1] || '').trim();
+    if (title.includes('八字排盘') || title.includes('八字')) {}
+    else if (title.includes('五行统计') || title.includes('五行')) {}
+    else if (title.includes('日主分析') || title.includes('日主')) {}
+    else if (title.includes('水晶推荐') || title.includes('水晶')) {}
+    else if (title.includes('珠宝饰品推荐') || title.includes('饰品推荐') || title.includes('珠宝')) {}
+    else if (title.includes('禁忌') || title.includes('不宜')) { tabooText = content.replace(/\n/g, ' '); }
+    else if (title.includes('合规') || title.includes('声明') || title.includes('免责')) {}
+    else if (title.includes('流年') && content) {
+      sections.push({ type: 'flowyear', title: title, icon: getReadingIcon(title), items: formatFlowYear(content) });
+    }
+    else if (title.includes('性格') || title.includes('事业') || title.includes('健康') || title.includes('运势') || title.includes('解读') || title.includes('2026') || title.includes('2027')) {
+      sections.push({ type: 'reading', title: title, icon: getReadingIcon(title), content: content });
+    } else {
+      sections.push({ type: 'reading', title: title, icon: '📖', content: content });
+    }
+  }
+  if (sections.length === 0 && text) {
+    sections.push({ type: 'reading', title: '详细解读', icon: '📖', content: text });
+  }
+  return { sections: sections, tabooText: tabooText };
+}
+
+function getReadingIcon(title) {
+  if (title.includes('性格')) return '🧠';
+  if (title.includes('事业') || title.includes('财运')) return '💼';
+  if (title.includes('健康')) return '❤️';
+  if (title.includes('流年') || title.includes('2026') || title.includes('2027')) return '📅';
+  return '📖';
+}
+
+function formatFlowYear(text) {
+  if (!text) return [];
+  var raw = text.trim();
+  var parts = raw.split(/\n+/);
+  if (parts.length <= 1) {
+    parts = raw.split(/(?:\d+[\.\)、] )|(?:[①②③④⑤⑥⑦⑧⑨⑩])/);
+    parts = parts.filter(function(p) { return p.trim(); });
+    if (parts.length <= 1) {
+      parts = raw.split(/[。！？]/);
+      parts = parts.filter(function(p) { return p.trim(); });
+    }
+  }
+  var lines = parts.map(function(p) {
+    return p.replace(/^[•·\-–—●○◆◇▪▸►\s]+/, '').replace(/^(?:\d{1,2}[\.\)、]\s*)+/, '').replace(/[，,、\s]+$/, '').trim();
+  }).filter(function(p) { return p.length > 0; });
+  if (lines.length <= 1) return [raw];
+  return lines;
+}
+
+// ============================================================
+// SAVE AS IMAGE (Canvas)
+// ============================================================
+
+function saveAsImage() {
+  showLoading('生成图片中...');
+
+  try {
+    var canvas = document.getElementById('reportCanvas');
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 2;
+    var W = 750;
+
+    var sections = collectReportSections();
+    var H = calcCanvasHeight(sections, ctx, W);
+
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.scale(dpr, dpr);
+
+    drawReport(ctx, W, H, sections);
+
+    setTimeout(function() {
+      try {
+        canvas.toBlob(function(blob) {
+          hideLoading();
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = '福久源五行珠宝报告_' + getNowDateStr() + '.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('图片已生成并开始下载', 'success');
+        }, 'image/png', 1);
+      } catch(e) {
+        hideLoading();
+        console.log('导出图片异常:', e);
+        showToast('生成失败，请重试');
+      }
+    }, 800);
+  } catch(e) {
+    hideLoading();
+    console.log('生成报告图片异常:', e);
+    showToast('生成失败，请重试');
+  }
+}
+
+function collectReportSections() {
+  var d = APP;
+  var baziData = d.currentBazi;
+  var sections = [];
+
+  sections.push({ type: 'title', text: '福久源中国黄金' });
+  sections.push({ type: 'subtitle', text: '☯ 五行珠宝报告' });
+  sections.push({ type: 'meta', text: getNowDateStr() });
+
+  // 八字排盘
+  if (baziData && baziData.pillars) {
+    var p = baziData.pillars;
+    sections.push({ type: 'sectionTitle', text: '📅 八字排盘' });
+    sections.push({ type: 'baziGrid', items: [
+      { label: '年柱', value: p.year, desc: '根基于祖辈' },
+      { label: '月柱', value: p.month, desc: '父母/事业' },
+      { label: '日柱', value: p.day, desc: '自身/婚姻' },
+      { label: '时柱', value: p.hour, desc: '子女/晚年' }
+    ]});
+  }
+
+  // 旺衰
+  if (baziData && baziData.wangShuai) {
+    sections.push({ type: 'sectionTitle', text: '⚖️ 旺衰格局' });
+    var ws = baziData.wangShuai;
+    sections.push({ type: 'wangshuai', content: '日主' + (ws.dayWuxing || baziData.riZhuWuxing) + ' · ' + ws.bodyLevel + ' · ' + ws.pattern, isSummary: true });
+    if (ws.details && ws.details.length > 0) {
+      ws.details.forEach(function(d) { sections.push({ type: 'wangshuai', content: d, isSummary: false }); });
+    }
+  }
+
+  // 五行
+  if (d.energyData && d.energyData.bars) {
+    sections.push({ type: 'sectionTitle', text: '📊 五行能量' });
+    sections.push({ type: 'wuxingBars', bars: d.energyData.bars });
+    if (d.energyData.samePercent > 0) {
+      sections.push({ type: 'tongdang', same: d.energyData.samePercent, diff: d.energyData.diffPercent });
+    }
+  }
+
+  // 水晶
+  if (d.currentBazi && d.currentBazi.crystal) {
+    var cr = d.currentBazi.crystal;
+    if (cr.mainCrystal && cr.mainCrystal.length > 0) {
+      sections.push({ type: 'sectionTitle', text: '💎 珠宝饰品推荐' });
+      if (cr.lifeExplain) sections.push({ type: 'crystalExplain', text: cr.lifeExplain });
+      sections.push({ type: 'crystalSubTitle', text: '🔹 主推推荐' });
+      var pinyinMap = { '金': 'jin', '水': 'shui', '木': 'mu', '火': 'huo', '土': 'tu' };
+      cr.mainCrystal.forEach(function(c) {
+        sections.push({ type: 'crystalItem', element: c.element, elementClass: pinyinMap[c.element] || 'jin', names: (c.list || []).join('、'), effect: c.effect || '' });
+      });
+      if (cr.assistCrystal && cr.assistCrystal.length > 0) {
+        sections.push({ type: 'crystalSubTitle', text: '🔸 辅助搭配' });
+        sections.push({ type: 'crystalAssist', tags: cr.assistCrystal });
+      }
+      if (cr.avoidCrystal && cr.avoidCrystal.length > 0) {
+        sections.push({ type: 'crystalAvoid', text: '⚠️ 谨慎选择：' + cr.avoidCrystal.slice(0, 6).join('、') });
+      }
+      if (cr.wearTip) sections.push({ type: 'crystalWearTip', text: cr.wearTip });
+    }
+  }
+
+  // 免责
+  sections.push({ type: 'disclaimer', text: '本内容为传统民俗文化参考，仅供饰品穿搭、心理舒缓参考，不具备科学决策、治病、改变命运的作用。\n八字算法流派众多，结果可能与其他软件不同，请自行交叉印证。' });
+  sections.push({ type: 'footer', text: '福久源中国黄金' });
+
+  return sections;
+}
+
+function calcCanvasHeight(sections, ctx, W) {
+  var FONT = 28;
+  ctx.font = FONT + 'px sans-serif';
+  var y = 50;
+  var padding = 40;
+  var contentW = W - padding * 2;
+
+  for (var i = 0; i < sections.length; i++) {
+    var s = sections[i];
+    switch (s.type) {
+      case 'title':       y += 56; break;
+      case 'subtitle':    y += 44; break;
+      case 'meta':        y += 40; break;
+      case 'sectionTitle': y += 60; break;
+      case 'baziGrid':    y += 130; break;
+      case 'wangshuai':
+        var lines = wrapText(ctx, s.content, contentW);
+        y += lines.length * 40 + (s.isSummary ? 16 : 4);
+        break;
+      case 'wuxingBars':  y += s.bars.length * 36 + 20; break;
+      case 'tongdang':    y += 60; break;
+      case 'crystalExplain': y += 60; break;
+      case 'crystalSubTitle': y += 40; break;
+      case 'crystalItem':  y += 80; break;
+      case 'crystalAssist': y += 40; break;
+      case 'crystalAvoid': y += 36; break;
+      case 'crystalWearTip': y += 80; break;
+      case 'disclaimer':  y += 80; break;
+      case 'footer':      y += 50; break;
+      default:            y += 10;
+    }
+  }
+  return y + 40;
+}
+
+function drawReport(ctx, W, H, sections) {
+  var _fillText = ctx.fillText.bind(ctx);
+  ctx.fillText = function(text, x, y, maxWidth) {
+    return _fillText(sanitizeText(text), x, y, maxWidth);
+  };
+
+  // 背景
+  ctx.fillStyle = '#FFFBF5';
+  ctx.fillRect(0, 0, W, H);
+
+  // 顶部金条
+  var goldGrad = ctx.createLinearGradient(0, 0, W, 0);
+  goldGrad.addColorStop(0, '#c9a96e');
+  goldGrad.addColorStop(0.5, '#e0c88a');
+  goldGrad.addColorStop(1, '#b8943f');
+  ctx.fillStyle = goldGrad;
+  ctx.fillRect(0, 0, W, 6);
+
+  var y = 50;
+  sections.forEach(function(s) {
+    y = drawSection(ctx, W, y, s);
+  });
+}
+
+function drawSection(ctx, W, y, s) {
+  var padding = 40;
+  var contentW = W - padding * 2;
+  ctx.textBaseline = 'top';
+
+  switch (s.type) {
+    case 'title':
+      ctx.fillStyle = '#3d2e0a';
+      ctx.font = 'bold 40px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(s.text, W / 2, y);
+      return y + 56;
+
+    case 'subtitle':
+      ctx.fillStyle = '#6b5a2e';
+      ctx.font = '26px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(s.text, W / 2, y);
+      return y + 44;
+
+    case 'meta':
+      ctx.fillStyle = '#999';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('生成时间：' + s.text, W / 2, y);
+      return y + 40;
+
+    case 'sectionTitle':
+      ctx.strokeStyle = '#e8dcc8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, y + 30);
+      ctx.lineTo(W - padding, y + 30);
+      ctx.stroke();
+      ctx.fillStyle = '#3d2e0a';
+      ctx.font = 'bold 28px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(s.text, padding, y + 6);
+      return y + 60;
+
+    case 'baziGrid':
+      return drawBaziGrid(ctx, W, y, padding, s.items);
+
+    case 'wangshuai':
+      ctx.textAlign = 'left';
+      if (s.isSummary) {
+        ctx.fillStyle = '#c9a96e';
+        ctx.font = 'bold 26px sans-serif';
+        ctx.fillText(s.content, padding, y);
+        return y + 42;
+      } else {
+        ctx.fillStyle = '#555';
+        ctx.font = '22px sans-serif';
+        var lines = wrapText(ctx, s.content, contentW);
+        lines.forEach(function(line, li) { ctx.fillText(line, padding, y + li * 38); });
+        return y + lines.length * 38 + 4;
+      }
+
+    case 'wuxingBars':
+      return drawWuxingBars(ctx, W, y, padding, contentW, s.bars);
+
+    case 'tongdang':
+      return drawTongDang(ctx, W, y, padding, contentW, s.same, s.diff);
+
+    case 'crystalExplain':
+      ctx.fillStyle = '#555';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'left';
+      var expl = wrapText(ctx, s.text, contentW);
+      expl.forEach(function(line, li) { ctx.fillText(line, padding, y + li * 30); });
+      return y + expl.length * 30 + 10;
+
+    case 'crystalSubTitle':
+      ctx.fillStyle = '#3d2e0a';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(s.text, padding, y);
+      return y + 40;
+
+    case 'crystalItem':
+      return drawCrystalItem(ctx, y, padding, contentW, s);
+
+    case 'crystalAssist':
+      ctx.fillStyle = '#c9a96e';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(s.tags.join('  '), padding, y + 4);
+      return y + 40;
+
+    case 'crystalAvoid':
+      ctx.fillStyle = '#e57373';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(s.text, padding, y + 4);
+      return y + 36;
+
+    case 'crystalWearTip':
+      ctx.fillStyle = '#555';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'left';
+      var tipLines = wrapText(ctx, '📿 佩戴指南：' + s.text, contentW);
+      tipLines.forEach(function(line, li) { ctx.fillText(line, padding, y + li * 30); });
+      return y + tipLines.length * 30 + 10;
+
+    case 'disclaimer':
+      ctx.fillStyle = '#aaa';
+      ctx.font = '18px sans-serif';
+      ctx.textAlign = 'center';
+      var dl = wrapText(ctx, s.text, contentW);
+      dl.forEach(function(line, li) { ctx.fillText(line, W / 2, y + li * 30); });
+      return y + dl.length * 30 + 20;
+
+    case 'footer':
+      ctx.fillStyle = '#c9a96e';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(s.text, W / 2, y + 10);
+      var grad = ctx.createLinearGradient(0, y + 40, W, y + 40);
+      grad.addColorStop(0, '#c9a96e');
+      grad.addColorStop(0.5, '#e0c88a');
+      grad.addColorStop(1, '#b8943f');
+      ctx.fillStyle = grad;
+      ctx.fillRect(padding, y + 40, contentW, 2);
+      return y + 50;
+
+    default:
+      return y;
+  }
+}
+
+function drawBaziGrid(ctx, W, y, padding, items) {
+  var colW = (W - padding * 2) / 4;
+  items.forEach(function(item, idx) {
+    var cx = padding + colW * idx;
+    roundRect(ctx, cx + 4, y + 4, colW - 8, 120, 10, 'rgba(201,169,110,0.06)', 'rgba(201,169,110,0.15)');
+    ctx.fillStyle = '#999'; ctx.font = '18px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(item.label, cx + colW / 2, y + 14);
+    ctx.fillStyle = '#3d2e0a'; ctx.font = 'bold 32px sans-serif';
+    ctx.fillText(item.value, cx + colW / 2, y + 44);
+    ctx.fillStyle = '#999'; ctx.font = '16px sans-serif';
+    ctx.fillText(item.desc, cx + colW / 2, y + 84);
+  });
+  return y + 130;
+}
+
+function drawWuxingBars(ctx, W, y, padding, contentW, bars) {
+  var barH = 22, gap = 14, labelW = 40, valW = 60;
+  var trackX = padding + labelW + 8;
+  var trackW = contentW - labelW - valW - 8;
+  var fillColors = { jin: '#c9a96e', mu: '#4CAF50', shui: '#42A5F5', huo: '#F44336', tu: '#FF9800' };
+
+  bars.forEach(function(bar, idx) {
+    var by = y + idx * (barH + gap);
+    ctx.fillStyle = '#3d2e0a'; ctx.font = '22px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(bar.label, padding + labelW / 2, by + 1);
+    ctx.fillStyle = '#e8dcc8'; ctx.fillRect(trackX, by, trackW, barH);
+    ctx.fillStyle = fillColors[bar.name] || '#c9a96e';
+    ctx.fillRect(trackX, by, trackW * (bar.percent / 100), barH);
+    ctx.fillStyle = '#3d2e0a'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(bar.percent + '%', W - padding, by + 1);
+  });
+  return y + bars.length * (barH + gap) + 20;
+}
+
+function drawTongDang(ctx, W, y, padding, contentW, same, diff) {
+  ctx.fillStyle = '#3d2e0a'; ctx.font = '20px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('同党 ' + same + '%', padding, y);
+  ctx.textAlign = 'right';
+  ctx.fillText('异党 ' + diff + '%', W - padding, y);
+
+  var barY = y + 28, barH = 16;
+  ctx.fillStyle = '#e8dcc8';
+  ctx.fillRect(padding, barY, contentW, barH);
+  ctx.fillStyle = '#42A5F5';
+  ctx.fillRect(padding, barY, contentW * (same / 100), barH);
+  ctx.fillStyle = '#F44336';
+  ctx.fillRect(padding + contentW * (same / 100), barY, contentW * (diff / 100), barH);
+
+  return y + 60;
+}
+
+function drawCrystalItem(ctx, y, padding, contentW, s) {
+  var colors = { jin: '#c9a96e', mu: '#4CAF50', shui: '#42A5F5', huo: '#F44336', tu: '#FF9800' };
+  var tagColor = colors[s.elementClass] || '#c9a96e';
+
+  ctx.fillStyle = tagColor; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'left';
+  var tagW = ctx.measureText(s.element).width + 20;
+  roundRect(ctx, padding, y, tagW, 28, 14, tagColor, null);
+  ctx.fillStyle = '#FFFBF5';
+  ctx.fillText(s.element, padding + 10, y + 5);
+
+  ctx.fillStyle = '#3d2e0a'; ctx.font = 'bold 24px sans-serif';
+  ctx.fillText(s.names, padding + tagW + 14, y + 4);
+
+  ctx.fillStyle = '#777'; ctx.font = '18px sans-serif';
+  var efLines = wrapText(ctx, s.effect, contentW);
+  efLines.forEach(function(line, li) { ctx.fillText(line, padding, y + 38 + li * 26); });
+
+  return y + 38 + efLines.length * 26 + 12;
+}
+
+// ---- Canvas 工具函数 ----
+var _SANITIZE_RE = new RegExp('[' + String.fromCharCode(0xFE0F) + String.fromCharCode(0xFE0E) + '\\u200B\\u200C\\u200D\\uFEFF]', 'g');
+function sanitizeText(text) {
+  if (!text) return '';
+  return text.replace(_SANITIZE_RE, '');
+}
+
+function wrapText(ctx, text, maxWidth) {
+  if (!text) return [];
+  var lines = [];
+  var current = '';
+  for (var i = 0; i < text.length; i++) {
+    var ch = text.charAt(i);
+    var test = current + ch;
+    if (ctx.measureText(test).width > maxWidth && current.length > 0) {
+      lines.push(current);
+      current = ch;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function roundRect(ctx, x, y, w, h, r, fillColor, strokeColor) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+  if (fillColor) { ctx.fillStyle = fillColor; ctx.fill(); }
+  if (strokeColor) { ctx.strokeStyle = strokeColor; ctx.stroke(); }
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function shareResult() {
+  if (navigator.share) {
+    navigator.share({
+      title: '福久源中国黄金 — 五行珠宝专属报告',
+      text: '了解你的五行属性，找到适合你的珠宝饰品',
+      url: window.location.href
+    }).catch(function() {});
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+      showToast('链接已复制，可粘贴分享', 'success');
+    }).catch(function() {
+      showToast('分享功能需要在微信中打开');
+    });
+  }
+}
+</script>
+
+</body>
+</html>
